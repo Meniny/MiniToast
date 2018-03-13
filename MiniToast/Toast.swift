@@ -8,51 +8,91 @@ public let kDefaultToastCornerRadius: CGFloat = 3
 public let kDefaultToastDuration: TimeInterval = 2.5
 public let kDefaultToastTopPadding: CGFloat = 50
 public let kDefaultToastBottomPadding: CGFloat = 50
+public let kDefaultToastBackgroundColor: UIColor = UIColor.init(white: 0, alpha: 0.8)
+public let kDefaultToastTextColor: UIColor = UIColor.lightText
+public let kDefaultToastFont: UIFont = UIFont.systemFont(ofSize: 14)
 
 private let kDefaultToastAnimationDuration: TimeInterval = 0.25
 private let kSharedToastQueue: DispatchQueue = DispatchQueue.init(label: "cn.meniny.Toast.queue")
 private let kSharedToastSemaphore: DispatchSemaphore = DispatchSemaphore.init(value: 1)
 
-open class Toast {
+/// Toast Position
+///
+/// - top: At top with padding
+/// - center: At center with vertically offset
+/// - bottom: At bottom with padding
+public enum ToastPosition: Equatable {
+    case top(CGFloat)
+    case center(CGFloat)
+    case bottom(CGFloat)
     
-    /// Toast Position
-    ///
-    /// - top: At top with padding
-    /// - center: At center with vertically offset
-    /// - bottom: At bottom with padding
-    public enum Position: Equatable {
-        case top(CGFloat)
-        case center(CGFloat)
-        case bottom(CGFloat)
-        
-        public static func ==(lhs: Toast.Position, rhs: Toast.Position) -> Bool {
-            switch (lhs, rhs) {
-            case let (.top(a), .top(b)):
-                return a == b
-            case let (.bottom(a), .bottom(b)):
-                return a == b
-            case let (.center(a), .center(b)):
-                return a == b
-            default:
-                return false
-            }
+    public static func ==(lhs: ToastPosition, rhs: ToastPosition) -> Bool {
+        switch (lhs, rhs) {
+        case let (.top(a), .top(b)):
+            return a == b
+        case let (.bottom(a), .bottom(b)):
+            return a == b
+        case let (.center(a), .center(b)):
+            return a == b
+        default:
+            return false
         }
     }
+}
+
+public enum ToastQueueType {
+    case shared, specified(DispatchQueue, DispatchSemaphore)
+}
+
+public enum ToastBorderPosition {
+    case top, bottom
+}
+
+public enum ToastBorderType: Equatable {
+    case none
+    case single(ToastBorderPosition, UIColor)
+    case edges(CGFloat, UIColor)
     
-    public enum QueueType {
-        case shared, specified(DispatchQueue, DispatchSemaphore)
+    public static func ==(lhs: ToastBorderType, rhs: ToastBorderType) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none):
+            return true
+        case let (.single(a, c), .single(b, d)):
+            return a == b && c == d
+        case let (.edges(a, c), .edges(b, d)):
+            return a == b && c == d
+        default:
+            return false
+        }
     }
+}
+
+public struct ToastConfig {
+    public var position: ToastPosition = .bottom(kDefaultToastBottomPadding)
+    public var queueType: ToastQueueType = .shared
+    public var borderType: ToastBorderType = .none
+    public var duration: TimeInterval = kDefaultToastDuration
+    public var cornerRadius: CGFloat = kDefaultToastCornerRadius
+    public var backgroundColor: UIColor = kDefaultToastBackgroundColor
+    public var textColor: UIColor = kDefaultToastTextColor
+    public var font: UIFont = kDefaultToastFont
+    public var textAlignment: NSTextAlignment = .center
     
+    public static var `default`: ToastConfig {
+        let config = ToastConfig.init()
+        return config
+    }
+}
+
+open class Toast {
     // MARK: - OBJECTS
     
-    open let text: String
-    open let position: Toast.Position
-    open let queueType: Toast.QueueType
-    open private(set) var duration: TimeInterval = kDefaultToastDuration
+    open var text: String
+    open var configuration: ToastConfig
     open private(set) var hiddingCompletion: (() -> Void)?
     
     public var queue: DispatchQueue {
-        switch self.queueType {
+        switch self.configuration.queueType {
         case .specified(let q, _):
             return q
         default:
@@ -61,7 +101,7 @@ open class Toast {
     }
     
     public var semaphore: DispatchSemaphore {
-        switch self.queueType {
+        switch self.configuration.queueType {
         case .specified(_, let s):
             return s
         default:
@@ -69,73 +109,23 @@ open class Toast {
         }
     }
     
-    open var hasBorder: Bool {
-        get {
-            return self.contentView.hasBorder
-        }
-        set {
-            self.contentView.hasBorder = newValue
-        }
-    }
-    open var roundCornerRadius: CGFloat {
-        get {
-            return self.contentView.layer.cornerRadius
-        }
-        set {
-            self.contentView.layer.cornerRadius = newValue
-        }
-    }
-    open var borderColor: UIColor {
-        get {
-            return self.contentView.line.backgroundColor ?? UIColor.clear
-        }
-        set {
-            self.contentView.line.backgroundColor = newValue
-        }
-    }
-    open var backgroundColor: UIColor {
-        get {
-            return self.contentView.backgroundColor ?? UIColor.clear
-        }
-        set {
-            self.contentView.backgroundColor = newValue
-        }
-    }
-    open var textColor: UIColor {
-        get {
-            return self.contentView.label.textColor
-        }
-        set {
-            self.contentView.label.textColor = newValue
-        }
-    }
-    open var font: UIFont {
-        get {
-            return self.contentView.label.font
-        }
-        set {
-            self.contentView.label.font = newValue
-        }
-    }
-    open var textAlignment: NSTextAlignment {
-        get {
-            return self.contentView.label.textAlignment
-        }
-        set {
-            self.contentView.label.textAlignment = newValue
-        }
-    }
-    
     open let contentView: ToastContentView = ToastContentView.init()
     open private(set) var containerView: UIView?
     
-    public init(_ text: String,
-                at position: Toast.Position = Toast.Position.bottom(kDefaultToastBottomPadding),
-                queue order: Toast.QueueType = Toast.QueueType.shared) {
+    public init(_ text: String, configuration: ToastConfig) {
         self.text = text
-        self.position = position
-        self.queueType = order
-        self.contentView.text = text
+        self.configuration = configuration
+        self.contentView.text = self.text
+        self.apply(config: self.configuration)
+    }
+    
+    public func apply(config: ToastConfig) {
+        self.contentView.layer.cornerRadius = config.cornerRadius
+        self.contentView.borderType = config.borderType
+        self.contentView.backgroundColor = config.backgroundColor
+        self.contentView.label.textColor = config.textColor
+        self.contentView.label.textAlignment = config.textAlignment
+        self.contentView.label.font = config.font
     }
     
     // MARK: - PUBLIC FUNCTIONS
@@ -148,9 +138,9 @@ open class Toast {
     ///   - animated: If animated
     ///   - duration: Duration time
     ///   - position: Toast postion
-    ///   - queue: Order in queue
-    ///   - bordered: If has bottom line
-    ///   - rounded: Corner radius
+    ///   - border: Border type
+    ///   - corner: Corner radius
+    ///   - queue: Ordered in queue
     ///   - hiddingClosure: Hidding action
     /// - Returns: A `Toast`
     @discardableResult
@@ -158,14 +148,18 @@ open class Toast {
                          to view: UIView? = nil,
                          animated: Bool = true,
                          duration: TimeInterval = kDefaultToastDuration,
-                         at position: Toast.Position = .bottom(kDefaultToastBottomPadding),
-                         queue: Toast.QueueType = .shared,
-                         bordered: Bool = false,
-                         rounded: CGFloat = kDefaultToastCornerRadius,
+                         at position: ToastPosition = .bottom(kDefaultToastBottomPadding),
+                         border: ToastBorderType = .none,
+                         corner: CGFloat = kDefaultToastCornerRadius,
+                         queue: ToastQueueType = .shared,
                          hiddingClosure: (() -> Void)? = nil) -> Toast {
-        let toast = Toast.init(text, at: position, queue: queue)
-        toast.hasBorder = bordered
-        toast.roundCornerRadius = rounded
+        var config = ToastConfig.default
+        config.duration = duration
+        config.position = position
+        config.borderType = border
+        config.cornerRadius = corner
+        config.queueType = queue
+        let toast = Toast.init(text, configuration: config)
         toast.show(to: view, animated: animated, duration: duration, hiddingClosure: hiddingClosure)
         return toast
     }
@@ -176,14 +170,13 @@ open class Toast {
     ///   - view: Container view
     ///   - animated: If animated
     ///   - duration: Duration time
-    ///   - bordered: If has bottom line
     ///   - hiddingClosure: Hidding action
     open func show(to view: UIView? = nil,
                    animated: Bool = true,
                    duration: TimeInterval = kDefaultToastDuration,
                    hiddingClosure: (() -> Void)? = nil) {
         
-        self.duration = duration
+        self.configuration.duration = duration
         self.containerView = view ?? UIApplication.shared.keyWindow
         self.hiddingCompletion = hiddingClosure
         
@@ -226,7 +219,7 @@ open class Toast {
     private func show_layout() {
         self.containerView?.translates(subViews: self.contentView)
         self.contentView.left(>=16).right(>=16)
-        switch self.position {
+        switch self.configuration.position {
         case .top(let padding):
             self.contentView.top(padding).centerHorizontally()
             break
@@ -261,9 +254,9 @@ open class Toast {
     
     /// Auto hidding
     private func auto_hide() {
-        guard self.duration > 0 else { return }
+        guard self.configuration.duration > 0 else { return }
         self.waitingForAutoHidding = true
-        DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + self.duration, execute: {
+        DispatchQueue.global(qos: .default).asyncAfter(deadline: .now() + self.configuration.duration, execute: {
             self.manually_hiding(animated: true, completion: nil)
         })
     }
@@ -342,12 +335,41 @@ open class ToastContentView: ToastBaseView {
     open let line: UIView = UIView.init()
     open let label: UILabel = UILabel.init()
     
-    open var hasBorder: Bool {
+    private var _borderType: ToastBorderType = .none
+    open var borderType: ToastBorderType {
         get {
-            return !self.line.isHidden
+            return self._borderType
         }
         set {
-            self.line.isHidden = !newValue
+            self._borderType = newValue
+            switch self.borderType {
+            case .none:
+                self.line.isHidden = true
+                self.layer.borderWidth = 0
+                break
+            case .single(let position, let color):
+                
+                self.layer.borderWidth = 0
+                self.line.isHidden = false
+                self.line.backgroundColor = color
+                self.line.removeAllConstraints()
+                self.line.left(0).right(0).height(1)
+                
+                switch position {
+                case .top:
+                    self.line.top(0)
+                    break
+                case .bottom:
+                    self.line.bottom(0)
+                    break
+                }
+                break
+            case .edges(let w, let color):
+                self.line.isHidden = true
+                self.layer.borderWidth = w
+                self.layer.borderColor = color.cgColor
+                break
+            }
         }
     }
     
@@ -367,19 +389,8 @@ open class ToastContentView: ToastBaseView {
         self.layout(
             8,
             |-8-self.label.height(>=21)-8-|,
-            7,
-            |-0-self.line.height(1)-0-|,
-            0
+            8
         )
-        
-        self.label.textColor = UIColor.lightText
-        self.label.textAlignment = .center
-        self.label.font = UIFont.systemFont(ofSize: 14)
         self.label.numberOfLines = 0
-        
-        self.line.isHidden = true
-        self.line.backgroundColor = UIColor(red: 0.18, green: 0.73, blue: 0.89, alpha: 1.00)
-        
-        self.backgroundColor = UIColor.init(white: 0, alpha: 0.8)
     }
 }
