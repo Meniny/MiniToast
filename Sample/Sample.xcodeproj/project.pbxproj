@@ -18,6 +18,10 @@
 /* Begin PBXFileReference section */
 		017D4AE981EE32E635A70792 /* Pods-Sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Sample/Pods-Sample.debug.xcconfig"; sourceTree = "<group>"; };
 		1F78A736D03CCD19E52B123E /* Pods-Sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample.release.xcconfig"; path = "Pods/Target Support Files/Pods-Sample/Pods-Sample.release.xcconfig"; sourceTree = "<group>"; };
+		5C307B5520580E2100B09F36 /* MiniToast.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = MiniToast.podspec; path = ../MiniToast.podspec; sourceTree = "<group>"; };
+		5C307B5620580E2100B09F36 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		5C307B5720580E2100B09F36 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = LICENSE.md; path = ../LICENSE.md; sourceTree = "<group>"; };
+		5C307B5820580E2100B09F36 /* _config.yml */ = {isa = PBXFileReference; lastKnownFileType = text; name = _config.yml; path = ../_config.yml; sourceTree = "<group>"; };
 		64B0FC2A2057A2D20054082B /* Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64B0FC2D2057A2D20054082B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64B0FC2F2057A2D20054082B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -52,6 +56,10 @@
 		64B0FC212057A2D20054082B = {
 			isa = PBXGroup;
 			children = (
+				5C307B5820580E2100B09F36 /* _config.yml */,
+				5C307B5720580E2100B09F36 /* LICENSE.md */,
+				5C307B5520580E2100B09F36 /* MiniToast.podspec */,
+				5C307B5620580E2100B09F36 /* README.md */,
 				64B0FC2C2057A2D20054082B /* Sample */,
 				64B0FC2B2057A2D20054082B /* Products */,
 				3845B84FE18238F15662A6D5 /* Pods */,
