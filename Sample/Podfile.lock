@@ -1,0 +1,19 @@
+PODS:
+  - JustLayout (1.2.1)
+  - MiniToast (1.0.0):
+    - JustLayout
+
+DEPENDENCIES:
+  - MiniToast (from `../`)
+
+EXTERNAL SOURCES:
+  MiniToast:
+    :path: ../
+
+SPEC CHECKSUMS:
+  JustLayout: 3015f2e0d923f20cfa64ebf8830e2288e199486e
+  MiniToast: e4b0fd87a65daea7f038d995f5cd1044d2fa85ea
+
+PODFILE CHECKSUM: 16b8445966c762cbee95bb6bd6356e73b8e44edd
+
+COCOAPODS: 1.4.0
