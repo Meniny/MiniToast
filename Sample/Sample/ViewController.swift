@@ -33,7 +33,12 @@ class ViewController: UIViewController {
     
     func randomToast() {
         let index = Int(arc4random_uniform(UInt32(kAlerts.count)))
-        Toast.show(kAlerts[index], to: self.view, animated: true, duration: 3, at: .bottom(30), hiddingClosure: nil)
+        Toast.show(kAlerts[index],
+                   to: self.view,
+                   animated: true,
+                   duration: 3,
+                   at: .bottom(30),
+                   hiddingClosure: nil)
     }
 }
 
@@ -61,15 +66,19 @@ class NextViewController: UIViewController {
     
     func randomToast() {
         let index = Int(arc4random_uniform(UInt32(kAlerts.count)))
-        Toast.show(kAlerts[index],
-                   to: self.sub,
-                   animated: true,
-                   duration: 3,
-                   at: .center(0),
-                   queue: .specified(self.aQueue, self.aSemaphore),
-                   bordered: true,
-                   rounded: 3,
-                   hiddingClosure: nil)
+        
+        let dark = #colorLiteral(red: 0.60, green:0.50, blue:0.37, alpha:1.00)
+        let light = #colorLiteral(red: 1.00, green:0.91, blue:0.72, alpha:1.00)
+        
+        var config = ToastConfig.default
+//        config.position = .center(0)
+        config.backgroundColor = light
+        config.textColor = dark
+        config.cornerRadius = 5
+        config.borderType = .edges(1, dark)
+        config.queueType = .specified(aQueue, aSemaphore)
+        let toast = Toast.init(kAlerts[index], configuration: config)
+        toast.show(to: self.sub, animated: true, duration: 3, hiddingClosure: nil)
     }
 }
 

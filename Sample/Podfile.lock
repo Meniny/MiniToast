@@ -1,6 +1,6 @@
 PODS:
   - JustLayout (1.2.1)
-  - MiniToast (1.0.0):
+  - MiniToast (1.0.1):
     - JustLayout
 
 DEPENDENCIES:
@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   JustLayout: 3015f2e0d923f20cfa64ebf8830e2288e199486e
-  MiniToast: e4b0fd87a65daea7f038d995f5cd1044d2fa85ea
+  MiniToast: 8cd251bc03764f13e90ba4ff95cdfe6e62d21405
 
 PODFILE CHECKSUM: 16b8445966c762cbee95bb6bd6356e73b8e44edd
 
