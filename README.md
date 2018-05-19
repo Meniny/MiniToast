@@ -18,7 +18,9 @@
 
 ## 🏵 Introduction
 
-**MiniToast** is an Android toast view implementation for iOS..
+**MiniToast** is an Android toast view implementation for iOS.
+
+![preview](https://i.loli.net/2018/03/21/5ab2368f47ca2.png)
 
 ## 📋 Requirements
 
