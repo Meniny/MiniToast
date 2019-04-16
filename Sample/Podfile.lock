@@ -1,19 +1,25 @@
 PODS:
-  - JustLayout (1.2.1)
+  - JustLayout (1.6.1):
+    - JustLayout/Core (= 1.6.1)
+  - JustLayout/Core (1.6.1)
   - MiniToast (1.0.1):
     - JustLayout
 
 DEPENDENCIES:
   - MiniToast (from `../`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - JustLayout
+
 EXTERNAL SOURCES:
   MiniToast:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  JustLayout: 3015f2e0d923f20cfa64ebf8830e2288e199486e
-  MiniToast: 8cd251bc03764f13e90ba4ff95cdfe6e62d21405
+  JustLayout: 93629690e8b1512c7dbfa6a37797eda9983327e2
+  MiniToast: 1c094a7f486f3e49701ef9368c2d5d5367e61cf1
 
 PODFILE CHECKSUM: 16b8445966c762cbee95bb6bd6356e73b8e44edd
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.7.0.beta.3

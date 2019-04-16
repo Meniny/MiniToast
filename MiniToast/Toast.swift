@@ -109,7 +109,7 @@ open class Toast {
         }
     }
     
-    open let contentView: ToastContentView = ToastContentView.init()
+    public let contentView: ToastContentView = ToastContentView.init()
     open private(set) var containerView: UIView?
     
     public init(_ text: String, configuration: ToastConfig) {
@@ -332,8 +332,8 @@ open class ToastBaseView: UIView {
 
 open class ToastContentView: ToastBaseView {
     
-    open let line: UIView = UIView.init()
-    open let label: UILabel = UILabel.init()
+    public let line: UIView = UIView.init()
+    public let label: UILabel = UILabel.init()
     
     private var _borderType: ToastBorderType = .none
     open var borderType: ToastBorderType {
